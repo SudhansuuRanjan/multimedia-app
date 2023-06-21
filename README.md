@@ -435,16 +435,16 @@ Login Screen
 ![Multimedia App](https://i.ibb.co/ykLd4Qj/Screenshot-1409.png "a title")
 
 1. First Sigin with Google, the Dashboard Appears
-![Dashboard](https://i.ibb.co/whKZX8T/Screenshot-1410.png)
+![Screenshot (1410)](https://github.com/SudhansuuRanjan/multimedia-app/assets/77230416/ad963b80-bb2d-4f08-98eb-ea20e995576f)
 
 2. Create A folder
 ![Dashboard](https://i.ibb.co/gPd7cjY/Screenshot-1411.png)
 
-4. Create Files in that folder
+3. Create Files in that folder
 ![Dashboard](https://i.ibb.co/z7Y7yJT/Screenshot-1412.png)
 
-6. Now you can view all the files in the folders or you could view files from a particular folder.
-![Dashboard](https://i.ibb.co/whKZX8T/Screenshot-1410.png)
+4. Now you can view all the files in the folders or you could view files from a particular folder.
+![Screenshot (1410)](https://github.com/SudhansuuRanjan/multimedia-app/assets/77230416/ad963b80-bb2d-4f08-98eb-ea20e995576f)
 
-7. Now we can upload more files, create folders, preview files, edit filenames, see filebreakdown, download and also delete files, or you could just logout.
+5. Now we can upload more files, create folders, preview files, edit filenames, see filebreakdown, download and also delete files, or you could just logout.
 
