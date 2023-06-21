@@ -434,23 +434,17 @@ This is a multimedia app that allows users to upload files. Users can create an 
 Login Screen
 ![Multimedia App](https://i.ibb.co/ykLd4Qj/Screenshot-1409.png "a title")
 
-1. First Sigin with Google 
-<img src="https://i.ibb.co/whKZX8T/Screenshot-1410.png" alt="Screenshot-1410" >
+1. First Sigin with Google, the Dashboard Appears
+![Dashboard](https://i.ibb.co/whKZX8T/Screenshot-1410.png)
 
 2. Create A folder
-<img src="https://i.ibb.co/gPd7cjY/Screenshot-1411.png" alt="Screenshot-1411" >
+![Dashboard](https://i.ibb.co/gPd7cjY/Screenshot-1411.png)
 
-3. Create Files in that folder
-<img src="https://i.ibb.co/z7Y7yJT/Screenshot-1412.png" alt="Screenshot-1412" >
+4. Create Files in that folder
+![Dashboard](https://i.ibb.co/z7Y7yJT/Screenshot-1412.png)
 
-4. Now you can view all the files in the folders or you could view files from a particular folder.
-<img src="https://i.ibb.co/whKZX8T/Screenshot-1410.png" alt="Screenshot-1410" >
+6. Now you can view all the files in the folders or you could view files from a particular folder.
+![Dashboard](https://i.ibb.co/whKZX8T/Screenshot-1410.png)
 
-5. Now we can upload more files, create folders, preview files, edit filenames, see filebreakdown, download and also delete files, or you could just logout.
+7. Now we can upload more files, create folders, preview files, edit filenames, see filebreakdown, download and also delete files, or you could just logout.
 
-
-
-
-
-
- 
