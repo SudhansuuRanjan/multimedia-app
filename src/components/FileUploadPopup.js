@@ -42,6 +42,7 @@ const FileUploadPopup = ({
         setFileUploading(true);
         try {
             if (!fileToUpload) return;
+            if(allFolders.length === 0) return alert("First Create a folder to upload files.")
             if (
                 formData.fileName === "" || formData.fileType === "" || formData.folder === ""
             ) return alert("Please fill all the fields");
@@ -121,7 +122,11 @@ const FileUploadPopup = ({
                                 ))
                             }
                         </select>
-                    </div>
+                    </div >
+
+                    {allFolders && allFolders.length === 0 && <div style={styles.formControl}>
+                        <p>First Create a Folder to Upload File</p>
+                    </div>}
 
                     <div style={{ ...styles.formControl, paddingTop: "1rem" }}>
                         <button disabled={fileUploading} style={styles.submitBtn} type="submit">{
