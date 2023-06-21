@@ -20,10 +20,12 @@ const FileUploadPopup = ({
         fileUrl: "",
     })
 
+    // Handle FormData changes
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
     }
 
+    // Upload file to Firebase Storage and getting url
     const storeFile = async (file) => {
         const storage = getStorage();
         const filename = `${file.name}-${shortid.generate()}`
@@ -34,42 +36,43 @@ const FileUploadPopup = ({
         return url;
     }
 
+    // Creating a new doc in files collection with filedata
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFileUploading(true);
-    try {
-      if (!fileToUpload) return;
-      if (
-        formData.fileName === "" || formData.fileType === "" || formData.folder === ""
-      ) return alert("Please fill all the fields");
-      const fileUrl = await storeFile(fileToUpload);
-      const fileRef = collection(db, "files");
-      const payload = {
-        id: shortid.generate(),
-        fileName: formData.fileName,
-        fileType: formData.fileType,
-        folder: formData.folder,
-        fileUrl,
-        createdAt: new Date(),
-        createdBy: auth.currentUser.email,
-      }
-      await addDoc(fileRef, payload);
-      setShowFileModal(false);
-      alert("File uploaded successfully");
-      setFormData({
-        fileName: "",
-        fileType: "",
-        folder: "",
-        fileUrl: "",
-      })
-      setFileToUpload(null);
-      await getFiles();
-      setFileUploading(false);
-    } catch (error) {
-      console.log(error);
-      setFileUploading(false);
+        e.preventDefault();
+        setFileUploading(true);
+        try {
+            if (!fileToUpload) return;
+            if (
+                formData.fileName === "" || formData.fileType === "" || formData.folder === ""
+            ) return alert("Please fill all the fields");
+            const fileUrl = await storeFile(fileToUpload);
+            const fileRef = collection(db, "files");
+            const payload = {
+                id: shortid.generate(),
+                fileName: formData.fileName,
+                fileType: formData.fileType,
+                folder: formData.folder,
+                fileUrl,
+                createdAt: new Date(),
+                createdBy: auth.currentUser.email,
+            }
+            await addDoc(fileRef, payload);
+            setShowFileModal(false);
+            alert("File uploaded successfully");
+            setFormData({
+                fileName: "",
+                fileType: "",
+                folder: "",
+                fileUrl: "",
+            })
+            setFileToUpload(null);
+            await getFiles();
+            setFileUploading(false);
+        } catch (error) {
+            console.log(error);
+            setFileUploading(false);
+        }
     }
-  }
 
     const allFolders = folders && folders.filter((folder) => folder.folderName !== "All Files");
 

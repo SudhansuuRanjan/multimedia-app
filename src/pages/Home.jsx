@@ -37,6 +37,7 @@ export default function Home() {
   const [selectedFolderName, setSelectedFolderName] = useState("All Files");
 
 
+  // Get all files and Folders on page load
   useEffect(() => {
     getFolders();
     getFiles();
@@ -56,6 +57,7 @@ export default function Home() {
     },
   };
 
+  // Get all files created by the user and sort them by date created in descending order (newest first) from firestore
   const getFiles = async () => {
     const q = query(collection(db, "files"), where("createdBy", "==", auth.currentUser.email));
     const querySnapshot = await getDocs(q);
@@ -71,6 +73,7 @@ export default function Home() {
     setCurrentFolder(files);
   }
 
+  // Get all folders created by the user and sort them by date created in descending order (newest first) from firestore
   const getFolders = async () => {
     const q = query(collection(db, "folders"), where("createdBy", "==", auth.currentUser.email));
     const querySnapshot = await getDocs(q);
@@ -85,9 +88,7 @@ export default function Home() {
     setFolders(folders);
   }
 
-
-  
-
+  // Rename a File in firestore
   const renameFile = async (id, fileName) => {
     try {
       const fileRef = doc(db, "files", id);
@@ -97,6 +98,7 @@ export default function Home() {
     }
   }
 
+  // Delete a File in firestore
   const deleteFile = async (id) => {
     try {
       const fileRef = doc(db, "files", id);

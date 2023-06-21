@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { getAuth } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom';
 
@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 export const Header = () => {
   const auth = getAuth();
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
 
   const onLogout = () => {
     auth.signOut();
@@ -15,7 +14,7 @@ export const Header = () => {
 
   return (
     <header style={styles.header}>
-      <div style={{display:"flex", alignItems:"center",gap:"0.5rem"}}>
+      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
         <div>
           <img style={styles.photo} src={auth.currentUser.photoURL} alt="profilepic" />
         </div>
@@ -45,7 +44,7 @@ const styles = {
   headerSubText: {
     fontSize: '15px'
   },
-  photo:{
+  photo: {
     width: '4rem',
     height: '4rem',
     borderRadius: '50%'

@@ -35,7 +35,7 @@ const styles = {
     alignItems: 'center',
     flexDirection: 'column',
     justifyContent: 'center',
-    height:"10rem",
+    height: "10rem",
   },
   logoFirebase: {
     width: '60px',
