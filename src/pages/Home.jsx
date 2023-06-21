@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase.config';
 import { getAuth } from 'firebase/auth';
-import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { Header } from "../components/Header";
-import { AudioPlayer } from '../components/AudioPlayer';
-import { DocumentViewer } from '../components/DocumentViewer';
-import { VideoPlayer } from '../components/VideoPlayer';
-import { ImageViewer } from '../components/ImageViewer';
+import { collection, getDocs, query, where, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { Pie, Bar } from 'react-chartjs-2';
+import { AudioPlayer, ImageViewer, Loader, DocumentViewer, VideoPlayer, NewFolder, Folder, FileUploadPopup, Header } from '../components';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -19,9 +14,6 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-import FileUploadPopup from '../components/FileUploadPopup';
-import shortid from 'shortid';
-import Loader from '../components/Loader';
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -37,25 +29,16 @@ export default function Home() {
   const auth = getAuth();
   const [myFiles, setMyFiles] = useState(null)
   const [selectedFile, setSelectedFile] = useState(null)
-  const [filePath, setFilePath] = useState("/file-server/")
   const [showChartModal, setShowChartModal] = useState(false);
   const [showFileModal, setShowFileModal] = useState(false);
-  const [fileToUpload, setFileToUpload] = useState(null);
-  const [formData, setFormData] = useState({
-    fileName: "",
-    fileType: "",
-    folder: "",
-    fileUrl: "",
-  })
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
-
+  const [currentFolder, setCurrentFolder] = useState(null) // All Files, [folder name
+  const [folders, setFolders] = useState([]);
+  const [showFolderModal, setShowFolderModal] = useState(false);
+  const [selectedFolderName, setSelectedFolderName] = useState("All Files");
 
 
   useEffect(() => {
-    // setMyFiles(data);
+    getFolders();
     getFiles();
   }, [])
 
@@ -78,47 +61,46 @@ export default function Home() {
     const querySnapshot = await getDocs(q);
     const files = [];
     querySnapshot.forEach((doc) => {
-      doc.data().id = doc.id;
-      files.push(doc.data());
+      const data = doc.data();
+      data.uid = doc.id;
+      files.push(data);
     });
+    files.sort((a, b) => b.createdAt - a.createdAt);
     // console.log(files);
     setMyFiles(files);
+    setCurrentFolder(files);
   }
 
-  const storeFile = async (file) => {
-    const storage = getStorage();
-    const filename = `${file.name}-${shortid.generate()}`
-    const storageRef = ref(storage, 'files/' + filename);
-    await uploadBytesResumable(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    return url;
+  const getFolders = async () => {
+    const q = query(collection(db, "folders"), where("createdBy", "==", auth.currentUser.email));
+    const querySnapshot = await getDocs(q);
+    const folders = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      data.uid = doc.id;
+      folders.push(data);
+    });
+    folders.sort((a, b) => b.createdAt - a.createdAt);
+    // console.log(folders);
+    setFolders(folders);
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+
+  
+
+  const renameFile = async (id, fileName) => {
     try {
-      if (!fileToUpload) return;
-      const fileUrl = await storeFile(fileToUpload);
-      const fileRef = collection(db, "files");
-      const payload = {
-        id: shortid.generate(),
-        fileName: formData.fileName,
-        fileType: formData.fileType,
-        folder: formData.folder,
-        fileUrl,
-        createdAt: new Date(),
-        createdBy: auth.currentUser.email,
-      }
-      await addDoc(fileRef, payload);
-      setShowFileModal(false);
-      alert("File uploaded successfully");
-      setFormData({
-        fileName: "",
-        fileType: "",
-        folder: "",
-        fileUrl: "",
-      })
-      await getFiles();
+      const fileRef = doc(db, "files", id);
+      await updateDoc(fileRef, { fileName });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const deleteFile = async (id) => {
+    try {
+      const fileRef = doc(db, "files", id);
+      await deleteDoc(fileRef);
     } catch (error) {
       console.log(error);
     }
@@ -128,8 +110,13 @@ export default function Home() {
   return (
     <>
       {
+        showFolderModal && (
+          <NewFolder folders={folders} setShowFolderModal={setShowFolderModal} getFolders={getFolders} />
+        )
+      }
+      {
         showFileModal && (
-          <FileUploadPopup handleSubmit={handleSubmit} setShowFileModal={setShowFileModal} formData={formData} setFormData={setFormData} setFileToUpload={setFileToUpload} handleChange={handleChange} />
+          <FileUploadPopup getFiles={getFiles} folders={folders} setShowFileModal={setShowFileModal} />
         )
       }
       {showChartModal && (
@@ -200,28 +187,32 @@ export default function Home() {
             <p style={{ fontWeight: "bolder", fontSize: "1.1rem" }}>My Files</p>
             <p style={{ fontWeight: "bold" }}>User : {auth.currentUser.displayName}</p>
             <p style={{ fontWeight: "normal" }}>Email : {auth.currentUser.email}</p>
-            <p>Drive Path : {selectedFile ? "/file-server/" + selectedFile.folder : filePath}</p>
+            <p>Drive Path : {"/file-server/" + selectedFolderName}</p>
           </div>
           <div style={styles.controlTools}>
             <button style={styles.controlButton}
               onClick={() => setShowFileModal(true)}
             >Upload File</button>
             <button style={styles.controlButton}
-              onClick={() => {
+              onClick={async () => {
                 if (selectedFile) {
-                  const newFiles = myFiles.map(file => {
+                  const newName = prompt("Enter new name", selectedFile.fileName) ?? selectedFile.fileName;
+                  const newFiles = currentFolder.map(file => {
                     if (file.id === selectedFile.id) {
                       return {
                         ...file,
-                        fileName: prompt("Enter new name", file.fileName) ?? file.fileName
+                        fileName: newName,
                       }
                     }
                     return file
                   })
-                  setMyFiles(newFiles)
-                  setSelectedFile(null)
+                  setCurrentFolder(newFiles)
+                  await renameFile(selectedFile.uid, newName);
+                  setSelectedFile(null);
+                  await getFiles();
                 }
-              }}
+              }
+              }
             >Rename</button>
             <button style={styles.controlButton}
               onClick={() => {
@@ -240,18 +231,34 @@ export default function Home() {
               }}
             >Download</button>
             <button style={styles.controlButton}
-              onClick={() => {
+              onClick={async () => {
                 if (selectedFile) {
-                  const newData = myFiles.filter((file) => file.path !== selectedFile.path);
-                  setMyFiles(newData);
+                  await deleteFile(selectedFile.uid);
+                  const newData = currentFolder.filter((file) => file.fileUrl !== selectedFile.fileUrl);
+                  setCurrentFolder(newData);
                   setSelectedFile(null);
+                  await getFiles();
                 }
               }}
             >Delete</button>
           </div>
+          <div style={styles.controlTools}>
+            {
+              folders.map((folder) => (
+                <Folder setSelectedFile={setSelectedFile} setSelectedFolderName={setSelectedFolderName} selected={folder.folderName === selectedFolderName} files={myFiles} setCurrentFolder={setCurrentFolder} key={folder.id} folder={folder} />
+              ))
+            }
+
+            <div onClick={() => setShowFolderModal(true)} style={styles.Folder}>
+              <img style={styles.folderImG} src="./icons/newfolder.png" alt="folder" />
+              <div style={styles.name}>
+                Create Folder
+              </div>
+            </div>
+          </div>
           <div style={styles.fileContainer}>
             <div style={{ width: "100%", padding: 10 }}>
-              {!myFiles ? <Loader /> : myFiles.map((file) =>
+              {!currentFolder ? <Loader /> : currentFolder.map((file) =>
                 <div style={selectedFile?.fileUrl === file.fileUrl ? styles.fileSelected : styles.file} className="files" key={file.id} onClick={() => {
                   if (selectedFile && selectedFile.id === file.id) {
                     setSelectedFile(null)
@@ -261,19 +268,19 @@ export default function Home() {
                 }}>
                   {
                     file.fileType === 'video' && (
-                      <img src="./icons/youtube.png" style={{ width: 40, height: 40 }} />)
+                      <img alt='video' src="./icons/youtube.png" style={{ width: 40, height: 40 }} />)
                   }
                   {
                     file.fileType === 'audio' && (
-                      <img src="./icons/audio.png" style={{ width: 40, height: 40 }} />)
+                      <img alt='audio' src="./icons/audio.png" style={{ width: 40, height: 40 }} />)
                   }
                   {
                     file.fileType === 'document' && (
-                      <img src="./icons/doc.png" style={{ width: 40, height: 40 }} />)
+                      <img alt='doc' src="./icons/doc.png" style={{ width: 40, height: 40 }} />)
                   }
                   {
                     file.fileType === 'image' && (
-                      <img src="./icons/image.png" style={{ width: 40, height: 40 }} />)
+                      <img alt='pic' src="./icons/image.png" style={{ width: 40, height: 40 }} />)
                   }
                   <p>{file.fileName}</p>
                 </div>
@@ -411,5 +418,30 @@ const styles = {
     cursor: 'pointer',
     fontWeight: 'bold',
     backgroundColor: '#eee',
-  }
+  },
+  Folder: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100px",
+    height: "100px",
+    backgroundColor: "#fff",
+    borderRadius: "10px",
+    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+    cursor: "pointer",
+    transition: "all 0.3s ease-in-out",
+    ":hover": {
+      transform: "scale(1.05)",
+    }
+  },
+  folderImG: {
+    width: "50px",
+    height: "50px",
+  },
+  name: {
+    fontSize: "0.8rem",
+    fontWeight: "bold",
+    marginTop: "0.5rem",
+  },
 };

@@ -53,8 +53,9 @@ const styles = {
         border: '1px solid #ddd',
         borderRadius: '5px',
         cursor: 'pointer',
-        fontSize: '15px',
-        padding: '5px 10px',
+        fontSize: '1rem',
+        fontWeight: '500',
+        padding: '0.5rem 1rem',
         margin: '10px 0',
         display: 'flex',
         alignItems: 'center',
@@ -70,6 +71,5 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: '100vh'
     }
 }
