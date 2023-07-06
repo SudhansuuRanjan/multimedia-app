@@ -26,7 +26,7 @@ This is a multimedia app that allows users to upload files. Users can create an 
 
 - The `App.js` sets up routes for a React application using React Router. It imports the two pages `Login` and `Dashboard`, defines routes for public and protected pages, and wraps them in a router component.
 
-    ```
+    ```jsx
     // App.js
 
     import Home from './pages/Home'
@@ -56,7 +56,7 @@ This is a multimedia app that allows users to upload files. Users can create an 
 
 - The `PrivateRoute.js` component defines a PrivateRoute component that is used to protect certain routes in the React app. It imports Navigate and Outlet components from react-router-dom for routing functionality and `useAuthStatus` custom hook for authentication status.
 
-    ```
+    ```jsx
     // useAuthStatus.js
 
     import { getAuth, onAuthStateChanged } from 'firebase/auth'
@@ -92,7 +92,7 @@ This is a multimedia app that allows users to upload files. Users can create an 
 
 - The component first checks the `checkingStatus` variable to display a loading spinner while the authentication status is being checked. Once the status is determined, if the user is logged in (loggedIn is true), it renders the child components using the Outlet component. Otherwise, it redirects the user to the login page using the Navigate component.
 
-    ```
+    ```jsx
     // PrivateRoute.js
 
     import { Navigate, Outlet } from "react-router-dom"
@@ -117,7 +117,7 @@ This is a multimedia app that allows users to upload files. Users can create an 
 
 - The `Login.js` component defines a Login component that is used to login to the React app. It imports the `useAuth` custom hook for authentication functionality and `useNavigate` hook for navigation functionality.
 
-    ```
+    ```jsx
     import React from 'react'
     import OAuth from '../components/OAuth'
 
@@ -144,7 +144,7 @@ This is a multimedia app that allows users to upload files. Users can create an 
 
 - In `OAuth.js` component, `handleOauth` function handles the Google Authentication and also checks if the user exists in firestore. If user does not exist in firestore, it creates a new document in firestore.
 
-    ```
+    ```jsx
     const navigate = useNavigate()
         const handleOAuth = async () => {
             try {
@@ -177,7 +177,7 @@ This is a multimedia app that allows users to upload files. Users can create an 
 
 - The `Home.js` Component, First we importing all the required components and firebase and ChartJs libraries,, hooks and functions.
 
-    ```
+    ```jsx
     import React, { useState, useEffect } from 'react';
     import { db } from '../firebase.config';
     import { getAuth } from 'firebase/auth';
@@ -191,8 +191,8 @@ This is a multimedia app that allows users to upload files. Users can create an 
 
     Define the state variables and functions to Fetch all the files and folders from firestore and store them in state variables. Also define the state variables and functions to open and close modals and also delete and edit Files.
 
-    ```
-    const auth = getAuth();
+    ```jsx
+  const auth = getAuth();
   const [myFiles, setMyFiles] = useState(null)
   const [selectedFile, setSelectedFile] = useState(null)
   const [showChartModal, setShowChartModal] = useState(false);
@@ -276,7 +276,7 @@ This is a multimedia app that allows users to upload files. Users can create an 
     
     Popups to Create a new folder and upload a new file
 
-    ```
+    ```jsx
     {
         showFolderModal && (
           <NewFolder folders={folders} setShowFolderModal={setShowFolderModal} getFolders={getFolders} />
@@ -290,7 +290,7 @@ This is a multimedia app that allows users to upload files. Users can create an 
     ```
      Mapping Folders and Create Folder button
 
-     ```
+     ```jsx
      <div style={styles.controlTools}>
             {
               folders.map((folder) => (
@@ -342,7 +342,7 @@ This is a multimedia app that allows users to upload files. Users can create an 
 
     Create Folder Popup is opened when we click new folder button. In `NewFolder` component we are handing folder creation using function `handleFolderCreate`, If the folder with the name exists or it is empty we reject, else we are creating the folder in firestore in `folders` collection.
 
-     ```
+     ```jsx
      const handleFolderCreate = async (e) => {
         e.preventDefault();
         setFolderCreating(true);
@@ -378,7 +378,7 @@ This is a multimedia app that allows users to upload files. Users can create an 
     ```
     Create File Popup is opened when we click Upload File button. In `FileUploadPopup` component we are handing folder creation using function `handleFolderCreate`, If the formdata is valid we are uploading file, getting its url and creating a new doc in firestore in `files` collection.
 
-    ```
+    ```jsx
     // Upload file to Firebase Storage and getting url
     const storeFile = async (file) => {
         const storage = getStorage();
